@@ -33,7 +33,7 @@ async def v1Post(post_id: int) :
 		).format(
 			**{ k: escape(str(v)) for k, v in data.items() },
 		),
-		status=301,
+		status_code=301,
 		headers={
 			'location': f'https://www.furaffinity.net/view/{post_id}',
 		},
