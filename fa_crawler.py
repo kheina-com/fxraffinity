@@ -56,7 +56,6 @@ class FurAffinityCrawler(Hashable) :
 
 		# now we can actually crawl
 
-		print(document.xpath('//img[@id="submissionImg"]/@src'))
 		image_url = first(document.xpath('//img[@id="submissionImg"]/@src', **self.xpathargs))
 		if not image_url :
 			raise SiteNotCrawled('submission does not contain an image.')
@@ -95,7 +94,7 @@ class FurAffinityCrawler(Hashable) :
 		if not artist :
 			raise SiteNotCrawled('could not find artist in html.')
 
-		description = first(document.xpath('//div[@class="submission-content"]/section/div[@class="section-body"]/div[contains(@class, "submission-description")]', **self.xpathargs))
+		description = ''.join(document.xpath('//div[@class="submission-content"]/section/div[@class="section-body"]/div[contains(@class, "submission-description")]//text()', **self.xpathargs)).strip()
 
 		title = first(document.xpath('//div[@class="submission-id-container"]//div[@class="submission-title"]//p/text()', **self.xpathargs))
 		if not title :

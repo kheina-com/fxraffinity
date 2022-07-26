@@ -25,7 +25,6 @@ credentials
 **/__pycache__
 **/Pipfile
 **/.py*
-server.py
 
 # text files, except requirements files, should they exist
 *.log
