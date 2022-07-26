@@ -13,6 +13,9 @@ app = ServerApp(
 		'fxraffinity.net',
 		'fxfuraffinity.net',
 		'vxfuraffinity.net',
+		'*.fxraffinity.net',
+		'*.fxfuraffinity.net',
+		'*.vxfuraffinity.net',
 	],
 )
 crawler = FurAffinityCrawler()
