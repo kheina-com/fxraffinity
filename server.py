@@ -31,7 +31,7 @@ async def v1Post(post_id: int) :
 			'<meta property="og:site_name" content="fxraffinity.net">'
 			'</head></html>'
 		).format(
-			**{ k: escape(v) for k, v in data.items() },
+			**{ k: escape(str(v)) for k, v in data.items() },
 		)
 	)
 
