@@ -1,0 +1,57 @@
+# credentials
+**/credentials.*
+**/credentials
+credentials
+
+# executables
+**/*.o
+
+# config files
+.vscode
+.DS_Store
+
+# database files
+**/*.db
+**/*.sql
+
+# images
+**/*.jpg
+**/*.png
+**/*.gif
+**/*.ico
+**/*.svg
+
+# python files
+**/__pycache__
+**/Pipfile
+**/.py*
+server.py
+
+# text files, except requirements files, should they exist
+*.log
+*.txt
+*.out
+!requirements.txt
+!requirements*.txt
+
+# back ups of files hosted remotely
+**/backups
+
+# experimental things
+ignore*
+
+# grab template files
+!*template.*
+
+# grab ALL markdown files. These are all readmes, setups, and tutorials
+!**/*.md
+
+# pypi files
+**/build/*
+**/dist/*
+build
+dist
+*.egg-info
+
+# pytest files
+.coverage
