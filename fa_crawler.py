@@ -85,12 +85,15 @@ class FurAffinityCrawler(Hashable) :
 
 		if artist :
 			artist_url = first(artist.xpath('@href', **self.xpathargs))
+
 			if artist_url :
 				artist_url = 'https://www.furaffinity.net' + artist_url
+
 			else :
 				raise SiteNotCrawled('could not find artist url in html.')
 
 			artist = first(artist.xpath('strong/text()', **self.xpathargs))
+
 		if not artist :
 			raise SiteNotCrawled('could not find artist in html.')
 
