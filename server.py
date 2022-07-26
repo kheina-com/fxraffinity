@@ -38,4 +38,4 @@ async def v1Post(post_id: int) :
 
 if __name__ == '__main__' :
 	from uvicorn.main import run
-	run(app, host='127.0.0.1', port=80)
+	run(app, host='127.0.0.1', port=8000)
