@@ -101,7 +101,7 @@ class FurAffinityCrawler(Hashable) :
 			self.logger.warning(f'could not find submission title in html. url: {self.url}')
 
 		return {
-			'image_url': image_url,
+			'image': image_url,
 			'title': title,
 			'timestamp': uploadTimestamp,
 			'description': description,

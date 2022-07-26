@@ -3,6 +3,7 @@ from kh_common.logging import getLogger
 from kh_common.caching import ArgsCache
 from fastapi.responses import HTMLResponse
 from fa_crawler import FurAffinityCrawler
+from html import escape
 
 logger = getLogger()
 app = ServerApp(auth=False)
@@ -30,7 +31,7 @@ async def v1Post(post_id: int) :
 			'<meta property="og:site_name" content="fxraffinity.net">'
 			'</head></html>'
 		).format(
-			**data,
+			**{ k: escape(v) for k, v in data.items() },
 		)
 	)
 
