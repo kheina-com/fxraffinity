@@ -10,7 +10,9 @@ logger = getLogger()
 app = ServerApp(
 	auth=False,
 	allowed_hosts=[
-		'fxraffinity.net'
+		'fxraffinity.net',
+		'fxfuraffinity.net',
+		'vxfuraffinity.net',
 	],
 )
 crawler = FurAffinityCrawler()
