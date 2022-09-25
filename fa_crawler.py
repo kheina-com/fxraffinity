@@ -2,6 +2,7 @@ from kh_common.gateway import ClientResponse, Gateway
 from kh_common.hashing import Hashable
 from lxml.html import fromstring
 from kh_common.config.credentials import furaffinity
+from urllib.parse import urlparse
 
 
 class First :
@@ -26,7 +27,13 @@ def isint(s) :
 	except : return None
 
 
-FurAffinityGateway: Gateway = Gateway('https://www.furaffinity.net/view/{id}', decoder=ClientResponse.text)
+async def response_text(response: ClientResponse) -> str :
+	# furaffinity seems to be responding with mangled unicode in some
+	# places, so we need to tell the decoder to ignore such errors
+	return (await response.read()).decode(errors='replace')
+
+
+FurAffinityGateway: Gateway = Gateway('https://www.furaffinity.net/view/{id}', decoder=response_text)
 
 
 class FurAffinityCrawler(Hashable) :
@@ -37,10 +44,10 @@ class FurAffinityCrawler(Hashable) :
 	async def crawl(self: 'FurAffinityCrawler', post_id: int) :
 		html = await FurAffinityGateway(id=post_id, headers=furaffinity['headers'])
 		document = fromstring(html)
-		return self.parse(document)
+		return self.parse(document, post_id)
 
 
-	def parse(self: 'FurAffinityCrawler', document) :
+	def parse(self: 'FurAffinityCrawler', document, post_id) :
 		# check that the website isn't down and etc etc
 		if first(document.xpath('//body//div[@class="attribution"]/a/text()', **self.xpathargs)) == 'DDoS protection by Cloudflare' :
 			raise SiteNotCrawled('furaffinity is currently behind cloudflare.')
@@ -103,6 +110,15 @@ class FurAffinityCrawler(Hashable) :
 		if not title :
 			self.logger.warning(f'could not find submission title in html. url: {self.url}')
 
+		# get thumbnail host
+		data_preview_src = first(document.xpath('//img[@id="submissionImg"]/@data-preview-src', **self.xpathargs))
+		if not data_preview_src :
+			data_preview_src = 'https://t.facdn.net'
+
+		# for furaffinity crawls, self.url holds the webcode
+		thumbnail = f'https://{urlparse(data_preview_src).netloc}/{post_id}@{{}}-{timestamp}.jpg'
+		thumbnails = [thumbnail.format(r) for r in (200, 300, 400, 600, 800)]
+
 		return {
 			'image': image_url,
 			'title': title,
@@ -110,4 +126,5 @@ class FurAffinityCrawler(Hashable) :
 			'description': description,
 			'artist': artist,
 			'artist_url': artist_url,
+			'thumbnails': thumbnails,
 		}

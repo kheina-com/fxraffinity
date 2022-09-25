@@ -16,6 +16,7 @@ app = ServerApp(
 		'*.fxraffinity.net',
 		'*.fxfuraffinity.net',
 		'*.vxfuraffinity.net',
+		'localhost',
 	],
 )
 crawler = FurAffinityCrawler()
@@ -56,9 +57,11 @@ async def v1Post(req: Request, post_id: int) :
 			'<meta property="og:site_name" content="fxraffinity.net">'
 			'</head></html>'
 		).format(
-			**{ k: escape(str(v)) for k, v in data.items() },
+			title=escape(str(data['title'])),
+			image=escape(str(data['thumbnails'][-1])),
+			description=escape(str(data['description'])),
 		),
-		status_code=200 if req.headers['user-agent'] in generate_embed_user_agents else 302,
+		status_code=200 if req.headers.get('user-agent') in generate_embed_user_agents else 302,
 		headers={
 			'location': f'https://www.furaffinity.net/view/{post_id}',
 		},
@@ -67,4 +70,4 @@ async def v1Post(req: Request, post_id: int) :
 
 if __name__ == '__main__' :
 	from uvicorn.main import run
-	run(app, host='0.0.0.0', port=80)
+	run(app, host='0.0.0.0', port=5000)
