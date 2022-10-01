@@ -71,6 +71,21 @@ class FurAffinityCrawler(Hashable) :
 		if filetype :
 			raise SiteNotCrawled('submission is not an image.')
 
+
+		sidebar = first(document.xpath('//div[@class="submission-sidebar"]', **self.xpathargs))
+		resolution = first(sidebar.xpath('self::*//section[@class="info text"]//span[contains(preceding-sibling::*/text(), "Size")]/text()', **self.xpathargs))
+
+		if resolution :
+			resolution = resolution.split('x')
+			x = isint(resolution[0])
+			y = isint(resolution[1])
+
+			if x and y :
+				resolution = (x, y)
+
+			else :
+				resolution = None
+
 		timestamp = image_url.split('/')[5]  # this will ALWAYS be [5]
 
 		if isint(timestamp) is not None :
@@ -79,7 +94,7 @@ class FurAffinityCrawler(Hashable) :
 			uploadTimestamp = int(uploadTimestamp[:uploadTimestamp.find('.')])
 
 		elif timestamp in FurAffinityCrawler.submissionTypes :
-			raise SiteNotCrawled (f'submission is not an image. type: {timestamp}.')
+			raise SiteNotCrawled(f'submission is not an image. type: {timestamp}.')
 
 		else :
 			raise SiteNotCrawled(f'could not find image id (timestamp) from image url. image_url: {image_url}, timestamp: {timestamp}.')
@@ -127,4 +142,5 @@ class FurAffinityCrawler(Hashable) :
 			'artist': artist,
 			'artist_url': artist_url,
 			'thumbnails': thumbnails,
+			'resolution': resolution,
 		}

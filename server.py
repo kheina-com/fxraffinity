@@ -35,6 +35,7 @@ generate_embed_user_agents = {
 	"Mozilla/5.0 (compatible; January/1.0; +https://gitlab.insrt.uk/revolt/january)", 
 	"test",
 }
+thumbnail_cutoff: int = 1280 ** 2
 
 
 @ArgsCache(TTL_days=1)
@@ -47,6 +48,12 @@ async def _fetch_fa_post(id: int) :
 @app.get('/{post_id}')
 async def v1Post(req: Request, post_id: int) :
 	data = await _fetch_fa_post(post_id)
+	image = data['image']
+
+	if data['resolution'] :
+		if data['resolution'][0] * data['resolution'][1] > thumbnail_cutoff :
+			image = data['thumbnails'][-1]
+
 	return HTMLResponse(
 		(
 			'<html><head>'
@@ -58,7 +65,7 @@ async def v1Post(req: Request, post_id: int) :
 			'</head></html>'
 		).format(
 			title=escape(str(data['title'])),
-			image=escape(str(data['thumbnails'][-1])),
+			image=escape(str(image)),
 			description=escape(str(data['description'])),
 		),
 		status_code=200 if req.headers.get('user-agent') in generate_embed_user_agents else 302,
