@@ -46,11 +46,11 @@ async def _fetch_fa_post(id: int) :
 @app.get('/view/{post_id}')
 @app.get('/full/{post_id}')
 @app.get('/{post_id}')
-async def v1Post(req: Request, post_id: int) :
+async def v1Post(req: Request, post_id: int, full: str = None) :
 	data = await _fetch_fa_post(post_id)
 	image = data['image']
 
-	if data['resolution'] :
+	if data['resolution'] and full is None :
 		if data['resolution'][0] * data['resolution'][1] > thumbnail_cutoff :
 			image = data['thumbnails'][-1]
 
