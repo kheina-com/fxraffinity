@@ -75,6 +75,25 @@ async def v1Post(req: Request, post_id: int, full: str = None) :
 	)
 
 
+@app.get('/')
+async def v1Home(req: Request) :
+	return HTMLResponse(
+		(
+			'<html><head>'
+			'<meta name="description" property="og:description" content="{description}"><meta property="twitter:description" content="{description}">'
+			'<meta property="og:site_name" content="fxraffinity.net">'
+			'</head></html>'
+		).format(
+			description=f'Embed furaffinity posts directly into your chat of choice by replacing furaffinity.net with {req.url.hostname} in the post url.',
+		),
+		status_code=200 if req.headers.get('user-agent') in generate_embed_user_agents else 302,
+		headers={
+			'location': f'https://www.furaffinity.net',
+		},
+	)
+
+
+
 if __name__ == '__main__' :
 	from uvicorn.main import run
 	run(app, host='0.0.0.0', port=5000)
