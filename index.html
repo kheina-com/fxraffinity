@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang='en'>
+	<head>
+		<meta charset='utf-8'/>
+		<meta name="description" property="og:description" content="Embed furaffinity posts directly into your chat of choice by replacing &quot;furaffinity.net&quot; with &quot;{hostname}&quot; in the post url.">
+		<meta property="twitter:description" content="Embed furaffinity posts directly into your chat of choice by replacing &quot;furaffinity.net&quot; with &quot;{hostname}&quot; in the post url.">
+		<meta property="og:site_name" content="fxraffinity.net">
+		<meta property="twitter:site" content="@kheinacom"><meta property="twitter:card" content="summary">
+	</head>
+	<!-- ♀ -->
+	<body>
+		<style>
+			html, body {
+				font-family: Bitstream Vera Sans, DejaVu Sans, Arial, Helvetica, sans-serif;
+				background: #000;
+				width: 100vw;
+				height: 100vh;
+			}
+			html, body, p, main {
+				margin: 0;
+			}
+			body {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+			}
+			main {
+				color: #DDD;
+				text-align: center;
+				width: 100%;
+				background: #1E1F25;
+			}
+			div {
+				padding: 25px;
+			}
+			code {
+				background: #151416;
+				border-radius: 3px;
+				padding: 0.1em 0.25em;
+			}
+			a {
+				margin-top: 25px;
+				display: inline-block;
+				pointer-events: all;
+				text-decoration: none;
+				cursor: pointer;
+				position: relative;
+				border-radius: 3px;
+				padding: 0.5em 1em;
+				border: 1px solid #2D333A;
+				font-weight: normal;
+				background: #151416;
+				box-sizing: border-box;
+				box-shadow: 0 2px 3px 1px #000;
+				-webkit-transition: ease 0.15s;
+				-moz-transition: ease 0.15s;
+				-o-transition: ease 0.15s;
+				transition: ease 0.15s;
+			}
+			a:link, a:visited
+			{ color: #DDD; }
+			a:hover {
+				color: #2676D5;
+				border-color: #2676D5;
+				box-shadow: 0 0 10px 3px #000;
+			}
+		</style>
+		<main>
+			<div>
+				Embed furaffinity posts directly into your chat of choice by replacing "furaffinity.net" with "{hostname}" in the post url.
+				<br><br>
+				Example:
+				<br>
+				<code>https://www.furaffinity.net/view/42140481</code> becomes <code>https://{hostname}/view/42140481</code>
+				<br><br><br>
+				Advanced:
+				<br>
+				If you are having an issue where a thumbnail is being returned and you want the fullsize image loaded instead, you can add <code>?full</code> to the end of the url to forcefully load the fullsize image.
+				<br><br>
+				Example:
+				<br>
+				<code>https://{hostname}/view/42140481?full</code>
+				<br>
+				<a href="https://www.furaffinity.net/">Take Me To FurAffinity</a>
+			</div>
+		</main>
+	</body>
+</html>

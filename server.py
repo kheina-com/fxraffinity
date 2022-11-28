@@ -1,8 +1,8 @@
+from fastapi.responses import FileResponse, HTMLResponse
+from kh_common.caching import ArgsCache, SimpleCache
 from kh_common.server import Request, ServerApp
-from kh_common.logging import getLogger
-from kh_common.caching import ArgsCache
-from fastapi.responses import HTMLResponse
 from fa_crawler import FurAffinityCrawler
+from kh_common.logging import getLogger
 from html import escape
 
 
@@ -36,6 +36,22 @@ generate_embed_user_agents = {
 	"test",
 }
 thumbnail_cutoff: int = 1280 ** 2
+
+
+@SimpleCache(float('inf'))
+def index() :
+	with open('index.html') as file :
+		return file.read()
+
+
+@app.get('/')
+async def v1Home(req: Request) :
+	return HTMLResponse(index().replace('{hostname}', req.url.hostname))
+
+
+@app.get('/favicon.ico')
+async def favicon() :
+	return FileResponse('favicon.ico')
 
 
 @ArgsCache(TTL_days=1)
@@ -73,25 +89,6 @@ async def v1Post(req: Request, post_id: int, full: str = None) :
 			'location': f'https://www.furaffinity.net/view/{post_id}',
 		},
 	)
-
-
-@app.get('/')
-async def v1Home(req: Request) :
-	return HTMLResponse(
-		(
-			'<html><head>'
-			'<meta name="description" property="og:description" content="{description}"><meta property="twitter:description" content="{description}">'
-			'<meta property="og:site_name" content="fxraffinity.net">'
-			'</head></html>'
-		).format(
-			description=f'Embed furaffinity posts directly into your chat of choice by replacing furaffinity.net with {req.url.hostname} in the post url.',
-		),
-		status_code=200 if req.headers.get('user-agent') in generate_embed_user_agents else 302,
-		headers={
-			'location': f'https://www.furaffinity.net',
-		},
-	)
-
 
 
 if __name__ == '__main__' :
