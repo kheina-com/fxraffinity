@@ -46,7 +46,7 @@ def index() :
 
 @app.get('/')
 async def v1Home(req: Request) :
-	return HTMLResponse(index().replace('{hostname}', req.url.hostname))
+	return HTMLResponse(index().replace('{hostname}', req.url.hostname.split('www.')[-1]))
 
 
 @app.get('/favicon.ico')
