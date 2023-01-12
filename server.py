@@ -4,6 +4,7 @@ from kh_common.server import Request, ServerApp
 from fa_crawler import FurAffinityCrawler
 from kh_common.logging import getLogger
 from html import escape
+import aiohttp
 
 
 logger = getLogger()
@@ -35,13 +36,22 @@ generate_embed_user_agents = {
 	"Mozilla/5.0 (compatible; January/1.0; +https://gitlab.insrt.uk/revolt/january)", 
 	"test",
 }
-thumbnail_cutoff: int = 1280 ** 2
+thumbnail_cutoff: int = 5242880  # 5MB in bytes
 
 
 @SimpleCache(float('inf'))
 def index() :
 	with open('index.html') as file :
 		return file.read()
+
+
+async def headers(url) :
+	async with aiohttp.request(
+		'GET',
+		url,
+		timeout=aiohttp.ClientTimeout(0.5),
+	) as response :
+		return response.headers
 
 
 @app.get('/')
@@ -66,9 +76,14 @@ async def v1Post(req: Request, post_id: int, full: str = None) :
 	data = await _fetch_fa_post(post_id)
 	image = data['image']
 
-	if data['resolution'] and full is None :
-		if data['resolution'][0] * data['resolution'][1] > thumbnail_cutoff :
+	try :
+		image_headers = await headers(image)
+
+		if int(image_headers.get('content-length', 0)) > thumbnail_cutoff and full is None :
 			image = data['thumbnails'][-1]
+
+	except :
+		pass
 
 	return HTMLResponse(
 		(

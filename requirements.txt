@@ -1,4 +1,4 @@
 kh-common~=0.6.0
 lxml~=4.9.1
 gunicorn~=20.1.0
-aiofiles~=22.1.0
+aiohttp~=3.7.3
