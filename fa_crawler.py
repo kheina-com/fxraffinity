@@ -1,8 +1,9 @@
+from urllib.parse import urlparse
+
+from kh_common.config.credentials import furaffinity
 from kh_common.gateway import ClientResponse, Gateway
 from kh_common.hashing import Hashable
 from lxml.html import fromstring
-from kh_common.config.credentials import furaffinity
-from urllib.parse import urlparse
 
 
 class First :

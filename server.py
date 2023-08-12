@@ -1,10 +1,14 @@
+from html import escape
+from re import sub
+
+import aiohttp
 from fastapi.responses import FileResponse, HTMLResponse
 from kh_common.caching import ArgsCache, SimpleCache
-from kh_common.server import Request, ServerApp
-from fa_crawler import FurAffinityCrawler
+from kh_common.exceptions.http_error import BadGateway
 from kh_common.logging import getLogger
-from html import escape
-import aiohttp
+from kh_common.server import Request, ServerApp
+
+from fa_crawler import FurAffinityCrawler
 
 
 logger = getLogger()
@@ -39,10 +43,34 @@ generate_embed_user_agents = {
 thumbnail_cutoff: int = 5242880  # 5MB in bytes
 
 
+def minify_html(html: str) -> str :
+	for pat, rep in [
+		(r'[\t\r\n]', ''),           # remove formatting/tabbing
+		(r'\;\}', '}'),              # remove trailing semicolons that are unnecessary
+		(r'\s*(\{|\}|:)\s*', lambda x : x.group(1)),  # replace unnecessary whitespace
+		(r'>\s+<', '><'),            # do one final pass for any misc whitespace between tags
+	] :
+		html = sub(pat, rep, html)
+
+	return html
+
+
 @SimpleCache(float('inf'))
 def index() :
 	with open('index.html') as file :
-		return file.read()
+		return minify_html(file.read())
+
+
+@SimpleCache(float('inf'))
+def bad_gateway() :
+	with open('bad_gateway.html') as file :
+		return minify_html(file.read())
+
+
+@SimpleCache(float('inf'))
+def submission() :
+	with open('submission.html') as file :
+		return minify_html(file.read())
 
 
 async def headers(url) :
@@ -73,7 +101,16 @@ async def _fetch_fa_post(id: int) :
 @app.get('/full/{post_id}')
 @app.get('/{post_id}')
 async def v1Post(req: Request, post_id: int, full: str = None) :
-	data = await _fetch_fa_post(post_id)
+	try :
+		data = await _fetch_fa_post(post_id)
+
+	except BadGateway :
+		return HTMLResponse(
+			bad_gateway().replace(
+				'{url}', f'https://www.furaffinity.net/view/{post_id}', 1
+			),
+		)
+
 	image = data['image']
 
 	try :
@@ -86,15 +123,7 @@ async def v1Post(req: Request, post_id: int, full: str = None) :
 		pass
 
 	return HTMLResponse(
-		(
-			'<html><head>'
-			'<meta property="og:title" content="{title}"><meta property="twitter:title" content="{title}">'
-			'<meta property="og:image" content="{image}"><meta property="twitter:image" content="{image}">'
-			'<meta name="description" property="og:description" content="{description}"><meta property="twitter:description" content="{description}">'
-			'<meta property="twitter:site" content="@kheinacom"><meta property="twitter:card" content="summary_large_image">'
-			'<meta property="og:site_name" content="fxraffinity.net">'
-			'</head></html>'
-		).format(
+		submission().format(
 			title=escape(str(data['title'])),
 			image=escape(str(image)),
 			description=escape(str(data['description'])),
