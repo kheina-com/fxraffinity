@@ -45,10 +45,10 @@ thumbnail_cutoff: int = 5242880  # 5MB in bytes
 
 def minify_html(html: str) -> str :
 	for pat, rep in [
-		(r'[\t\r\n]', ''),           # remove formatting/tabbing
-		(r'\;\}', '}'),              # remove trailing semicolons that are unnecessary
+		(r'[\t\r\n]', ''),                            # remove formatting/tabbing
 		(r'\s*(\{|\}|:)\s*', lambda x : x.group(1)),  # replace unnecessary whitespace
-		(r'>\s+<', '><'),            # do one final pass for any misc whitespace between tags
+		(r'\;\}', '}'),                               # remove trailing semicolons that are unnecessary
+		(r'>\s+<', '><'),                             # do one final pass for any misc whitespace between tags
 	] :
 		html = sub(pat, rep, html)
 
@@ -115,6 +115,10 @@ async def v1Post(req: Request, post_id: int, full: str = None) :
 			site_not_crawled().replace(
 				'{reason}', str(e)
 			),
+			status_code=200 if req.headers.get('user-agent') in generate_embed_user_agents else 302,
+			headers={
+				'location': f'https://www.furaffinity.net/view/{post_id}',
+			},
 		)
 
 	except BadGateway :
