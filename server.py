@@ -8,7 +8,7 @@ from kh_common.exceptions.http_error import BadGateway
 from kh_common.logging import getLogger
 from kh_common.server import Request, ServerApp
 
-from fa_crawler import FurAffinityCrawler
+from fa_crawler import FurAffinityCrawler, SiteNotCrawled
 
 
 logger = getLogger()
@@ -73,6 +73,12 @@ def submission() :
 		return minify_html(file.read())
 
 
+@SimpleCache(float('inf'))
+def site_not_crawled() :
+	with open('site_not_crawled.html') as file :
+		return minify_html(file.read())
+
+
 async def headers(url) :
 	async with aiohttp.request(
 		'GET',
@@ -103,6 +109,13 @@ async def _fetch_fa_post(id: int) :
 async def v1Post(req: Request, post_id: int, full: str = None) :
 	try :
 		data = await _fetch_fa_post(post_id)
+
+	except SiteNotCrawled as e :
+		return HTMLResponse(
+			site_not_crawled().replace(
+				'{reason}', str(e)
+			),
+		)
 
 	except BadGateway :
 		return HTMLResponse(
